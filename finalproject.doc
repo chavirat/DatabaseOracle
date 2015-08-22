@@ -1,0 +1,146 @@
+Database Project
+Organization background
+Ping Identity provides identity and access management (IAM) solutions that give customers and employees one-click access to any application from any device. They are a software company that contracts with companies to provide a single sign-on for various programs like Office 356 and Google Apps.  They developed their own software which are made available to their clients:
+
+1.	PingOne: an Identity as a Service (IDaaS) solution that enables organizations to deliver single sign-on (SSO) for users with just one username and password—eliminating the multiple password security problem.
+2.	PingID: delivers a multi-factor authentication solution to secure access to all of your applications. Integrated with PingOne and PingFederate, it enables single sign-on with strong authentication to thousands of cloud and on-premises applications. 
+3.	PingAccess: securely enables both web and API access at a very large scale. Using a single administration console, PingAccess empowers IT to centralize identity and enforce policies quickly and reliably. 
+4.	PingFederate: delivers a comprehensive identity management solution that leverages your existing identity infrastructure to enable secure access to any application using any device.
+
+ They also provided many solutions for each clients by customizing their products with varieties open source software. They contract with many client companies across the globe, but focus on Denver area. 
+
+Problems
+Now, the company grows rapidly. They hire many sale representatives to increase the sales. However, they faced with higher cost of sales and can’t measure of each sale rep’s performance. Moreover, they collected many clients information including current and existing clients. Some companies are no longer their clients or continued to purchase supporting services. Thus, the company wants to focus on the retention of their customers and investigate the sale report of each sale representative. Additionally, the company has various software products and plans to increase product-line. The effective sale report can help the company to focus the direction and development of software products, the sale representative’s performance by counting amount of sales per year. 
+
+Business Rules
+The company wants to track the product of sales, number of current clients, level of supporting services, and contracts.  Moreover, Ping Identity has served many companies worldwide with focus towards the Denver area. Each client company has many contacts. The client company should include the company name, location (address, city, state, region, country), and phone. The contacts of different client company should include first name, last name, phone, email, and their ID number with their company. 
+
+Although the company still has one headquarter in Denver, it plans to expand their locations as their number of clients increase. Thus, the database should accommodate to this future need. Each headquarter has many employees. Some employees serve companies at their assigned region like sales, marketing, and regional representatives. Other employees serve Ping’s clients as a whole like support. 
+
+Companies also need to be organized and assigned to regions. Regions are dependent on the amount of companies within a given area. They can be divided by continents as in their Asia region. The can also be divided by country like their UK region. And countries can even further divided such as their Eastern US, Western US, and Southern US regions.
+
+The headquarter table should contain the location (address, city, state, region, country, zip code) and phone. 
+
+The employee should include every employee’s first name, last name, social security number, address (street, city, state, country, and zip code), salary, phone, email, date of hiring, year of work experience, and position. 
+
+Each employee sells none or many software products to the client companies. The client company can be served by many sale representatives. 
+
+Furthermore, the company wants to track the contract of each client company including the purchased software product, the initial date, end date, signed date, value of contract, amount of deposit, a sale representative who made the contract, and level of supporting service that be purchased. Once the client company makes the contract, it needs to pay deposit at least 20 percent of the value of contract. The initial date will be recorded after the contract was created. However, the signed date could be filled later. 
+
+There are different rates depending on the type of support level (bronze, silver, or gold). The client company can choose only one support level of each purchased product, and can change to different level of supporting service after the existing contract expired. If the client wants to switch to different level of supporting service, the company required them to make the new contract. In case to switch the level of supporting service before expiration date, the current contract will be invalid. 
+
+Moreover, the company allows the client company to pay in different periods. For example, the xyz company agrees to pay in two periods of contract for every year. The installment should include the payment number for each contract, the amount of payment, and date. 
+
+Database Design
+We focus on the sale report to serve the main issue as tracking sale, employee, client, and support level. Our database did not include the invoice number or the payment method because these information will be recorded in the accounting database. Moreover, most payment are paid by a cheque and make a transaction via the bank. Thus, we don’t need to add the type of payment in this database. To track sale revenue, we add the amount of sale per payment and date in the installment table.
+Business Process
+ 
+
+
+
+
+ 
+ERD
+ 
+
+
+FDs
+HQid  HQname, HQaddress, HQcity, HQstate, HQregion, HQcountry, HQzip, HQphone
+
+EMid  EMfirstname, EMlastname, EMssn, EMstreet, EMcity, EMstate, EMcountry, EMzip, EMsalary, EMphone, EMemail, EMdateofhire, EMworkexp, EMposition
+
+CLCOid  CLCOname, CLCOaddress, CLCOcity, CLCOstate, CLCOregion, CLCOcountry, CLCOzip, CLCOphone
+
+COid  COcompanyid, COfirstname, COlastname, COphone, COemail, COposition
+
+SULEid  SULEname, SULErate
+
+SECOid  SECOdatestart, SECOdateend, SECOdatesigned, SECOvalue, SECOdeposit
+
+ 
+Tables
+Headquarter (HEid, HEcountry, HEstate, HEcity, Headdress, HEzip, HEphone)
+
+Employee (EMid, EMfirstname, EMlastname, EMssn, EMaddress, EMcity, EMstate, EMcountry, EMzip, EMsalary, EMphone, EMemail, EMdateofhire, EMworkexp, EMposition)
+UNIQUE (EMssn)
+UNIQUE (EMemail)
+
+ClientCompany (CLCOid, CLCOname, CLCOaddress, CLCOcity, CLCOstate, CLCOregion, CLCOcountry, CLCOzip)
+
+Contact (COid, COcompanyid, COfirstname, COlastname, COphone, COemail)
+FOREIGN KEY CLCOid REFERENCES ClientCompany
+
+SupportLevel (SULEid, SULEname, SULErate)
+
+ServiceContract (SECOid, SECOdatestart, SECOdatesigned, SECOvalue, SECOdeposit, EMid, CLCOid, SULEid)
+FOREIGN KEY EMid REFERENCES Employee
+FOREIGN KEY CLCOid REFERENCES ClientCompany
+FOREIGN KEY SELEid REFERENCES SupportLevel
+
+Installment (SECOid, INid, INdate, INamount)
+FOREIGN KEY SECO REFERENCES ServiceContract
+
+ 
+Implementation on Microsoft Access 2013
+
+
+
+
+ 
+This is the form for service contracts.  
+
+When opening the form, switching between records, or changing the controlling field, the employee first name, employee last name, company name, company address, and company area will automatically change according to the corresponding ID.
+
+Here is the code:
+
+Option Compare Database
+
+Private Sub cboCOid_Click()
+Me.txtCOname.Value = Me.cboCOid.Column(1)
+Me.txtCOaddress.Value = Me.cboCOid.Column(2)
+Me.txtCOarea.Value = Me.cboCOid.Column(3)
+End Sub
+
+Private Sub cboEMid_Change()
+Me.txtfirstname.Value = Me.cboEMid.Column(1)
+Me.txtlastname.Value = Me.cboEMid.Column(2)
+End Sub
+
+
+Private Sub cboSULEname_Change()
+Me.txtSULErate.Value = Me.cboSULEname.Column(2)
+End Sub
+
+Private Sub Form_Current()
+Me.txtfirstname.Value = Me.cboEMid.Column(1)
+Me.txtlastname.Value = Me.cboEMid.Column(2)
+Me.txtSULErate.Value = Me.cboSULEname.Column(2)
+Me.txtCOname.Value = Me.cboCOid.Column(1)
+Me.txtCOaddress.Value = Me.cboCOid.Column(2)
+Me.txtCOarea.Value = Me.cboCOid.Column(3)
+End Sub
+
+
+
+ 
+This is the installment form.
+
+When opening the form, switching between records, or changing the Contract ID, the company name, date start, date end, and value will automatically change corresponding with the value in Contract ID.
+
+Here is the code.
+
+Option Compare Database
+
+Private Sub cboSECOid_Change()
+Me.txtCLCOname.Value = Me.cboSECOid.Column(1)
+Me.txtSECOdatestart.Value = Me.cboSECOid.Column(2)
+Me.txtSECOdateend.Value = Me.cboSECOid.Column(3)
+Me.txtSECOvalue.Value = Me.cboSECOid.Column(4)
+End Sub
+
+Private Sub Form_Current()
+Me.txtCLCOname.Value = Me.cboSECOid.Column(1)
+Me.txtSECOdatestart.Value = Me.cboSECOid.Column(2)
+Me.txtSECOdateend.Value = Me.cboSECOid.Column(3)
+Me.txtSECOvalue.Value = Me.cboSECOid.Column(4)
+End Sub
