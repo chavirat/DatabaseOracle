@@ -1,4 +1,4 @@
-@@ -0,0 +1,28 @@
+
 SELECT iif(([EventPlan.workdate] is null,[EventRequest.eventno]),
 	iif(((Year([EventPlan.workdate])=Year([EventRequest.dateheld])) 
 	AND (Month([EventPlan.workdate]) = Month([EventRequest.dateheld]))),[EventPlan.eventno]))
